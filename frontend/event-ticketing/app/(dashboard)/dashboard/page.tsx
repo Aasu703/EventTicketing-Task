@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Ticket, Calendar, Heart, TrendingUp, Clock, MapPin, DollarSign, ArrowUpRight, ArrowDownRight, Minus, Plus, Search, Filter, ChevronDown, MoreVertical, Star, Settings } from "lucide-react";
+import { Ticket, Calendar, Heart, TrendingUp, Clock, MapPin, DollarSign, ArrowUpRight, ArrowDownRight, Minus, Plus, Search, Filter, ChevronDown, MoreVertical, Star, Settings, User } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth";
 
 const stats = [
   {
@@ -137,6 +138,9 @@ const recentActivity = [
 ];
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const displayName = user?.username || 'User';
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
@@ -147,7 +151,7 @@ export default function DashboardPage() {
       >
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-            Welcome back, <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">John</span>!
+            Welcome back, <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{displayName}</span>!
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Here's what's happening with your events and tickets.

@@ -1,18 +1,39 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AuthForm from "../components/AuthForm";
-import { ArrowLeft, Shield, Award, CheckCircle, Ticket, Sparkles } from "lucide-react";
+import { ArrowLeft, Shield, Award, CheckCircle, Ticket, Sparkles, AlertCircle } from "lucide-react";
+import { api, type RegisterResponse } from "@/lib/api";
+import type { AuthFormData } from "../components/AuthForm";
 
 export default function RegisterPage() {
-  const handleSubmit = async (data: { email: string; password: string; name?: string }) => {
-    // TODO: Connect to backend API
-    console.log("Register attempt:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Simulate successful registration
-    window.location.href = "/dashboard";
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (data: AuthFormData) => {
+    // Narrow to RegisterData since mode is "register"
+    const registerData = data as { username: string; email: string; phoneNumber: string; password: string; confirmPassword: string };
+    setError(null);
+    
+    try {
+      const response = await api.register(registerData);
+      
+      // After successful registration, redirect to login page
+      // The backend doesn't return a token on register, so user needs to login
+      window.location.href = "/auth/login?registered=true";
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+      throw err; // Re-throw to let AuthForm handle loading state
+    }
   };
+
+  // Check for registered query param
+  const [showSuccess, setShowSuccess] = useState(false);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
@@ -91,6 +112,30 @@ export default function RegisterPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Account</h1>
             <p className="text-gray-600 dark:text-gray-400">Fill in your details to get started</p>
           </div>
+
+          {/* Success Message */}
+          {showSuccess && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400 text-sm"
+            >
+              <CheckCircle className="w-4 h-4 flex-shrink-0" />
+              <span>Account created successfully! Please sign in.</span>
+            </motion.div>
+          )}
+
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 text-sm"
+            >
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{error}</span>
+            </motion.div>
+          )}
 
           {/* Register Form */}
           <AuthForm mode="register" onSubmit={handleSubmit} />
