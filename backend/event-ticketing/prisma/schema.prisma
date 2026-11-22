@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model events {
+  id         Int       @id @default(autoincrement())
+  event_name String    @db.VarChar(100)
+  event_date DateTime? @db.Timestamp(6)
+}
+
+enum Role {
+  ADMIN
+  ORGANIZER
+  CUSTOMER
+}
+
+model User{
+  id         Int      @id @default(autoincrement())
+  username  String    @unique
+  email      String   @unique 
+  phoneNumber String 
+  password   String
+  role       Role[]   @default([CUSTOMER])
+  createdAt  DateTime @default(now())
+}
