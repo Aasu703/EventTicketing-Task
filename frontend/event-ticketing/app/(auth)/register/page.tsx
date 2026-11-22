@@ -6,7 +6,7 @@ import AuthForm from "../components/AuthForm";
 import { ArrowLeft, Shield, Award, CheckCircle, Ticket, Sparkles } from "lucide-react";
 
 export default function RegisterPage() {
-  const handleSubmit = async (data: { email: string; password: string; name: string }) => {
+  const handleSubmit = async (data: { email: string; password: string; name?: string }) => {
     // TODO: Connect to backend API
     console.log("Register attempt:", data);
     await new Promise((resolve) => setTimeout(resolve, 1000));

@@ -12,3 +12,11 @@ model events {
   event_name String    @db.VarChar(100)
   event_date DateTime? @db.Timestamp(6)
 }
+
+model User{
+  id         Int      @id @default(autoincrement())
+  userName  String?
+  email      String   @unique 
+  password   String
+  createdAt  DateTime @default(now())
+}
