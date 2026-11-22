@@ -1,9 +1,9 @@
-export type Role = 'Admin' | 'Organizer' | 'Customer';
+export type Role = 'ADMIN' | 'ORGANIZER' | 'CUSTOMER';
 
 export interface User {
     id: number;
     username: string;
     email: string;
-    phoneNumber: number;
-    roles: Role[];
+    phoneNumber: string;
+    role: Role[];
 }

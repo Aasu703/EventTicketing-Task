@@ -13,11 +13,18 @@ model events {
   event_date DateTime? @db.Timestamp(6)
 }
 
+enum Role {
+  ADMIN
+  ORGANIZER
+  CUSTOMER
+}
+
 model User{
   id         Int      @id @default(autoincrement())
-  userName  String?
+  username  String    @unique
   email      String   @unique 
-  phoneNumber BigInt 
+  phoneNumber String 
   password   String
+  role       Role[]   @default([CUSTOMER])
   createdAt  DateTime @default(now())
 }

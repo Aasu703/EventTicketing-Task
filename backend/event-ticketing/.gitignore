@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# Prisma 
+src/generated/prisma
+
 # TypeScript build cache
 *.tsbuildinfo
 

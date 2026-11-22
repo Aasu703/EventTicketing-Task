@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, MinLength} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsNumber, IsString, Matches, Max, MaxLength, Min, MinLength} from 'class-validator';
 import { Match } from '../common/decorators/match.decorator.js';
 
 export class CreateUserDto {
@@ -11,9 +11,8 @@ export class CreateUserDto {
     email: string;
 
     @IsString()
-    @IsNumber()
-    @Min(0)
-    @Max(9999999999)
+    @IsNotEmpty()
+    @Matches(/^9[78][0-9]{8}$/, { message: 'phoneNumber must be a valid phone number' })
     phoneNumber: string;
 
 
