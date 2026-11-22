@@ -10,11 +10,11 @@ export class CreateUserDto {
     @IsEmail()
     email: string;
 
-    @IsNotEmpty()
+    @IsString()
     @IsNumber()
     @Min(0)
     @Max(9999999999)
-    phoneNumber: number;
+    phoneNumber: string;
 
 
     @IsString()
