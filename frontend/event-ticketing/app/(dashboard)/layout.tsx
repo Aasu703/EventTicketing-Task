@@ -1,10 +1,11 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Ticket, Calendar, Heart, Settings, LogOut, User, Bell, ChevronDown, Home, Search } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -16,9 +17,39 @@ const navigation = [
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, token, isLoading, logout, isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  // Don't render anything while loading or not authenticated
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <span className="text-gray-600 dark:text-gray-400">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    logout();
+    router.push('/auth/login');
+  };
+
+  const displayName = user?.username || 'User';
+  const displayEmail = user?.email || 'user@example.com';
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
@@ -135,7 +166,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">John Doe</span>
+                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">{displayName}</span>
                   <ChevronDown className="w-4 h-4 text-gray-500 hidden sm:block" />
                 </button>
 
@@ -148,8 +179,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50"
                     >
                       <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">John Doe</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">john@example.com</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{displayName}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{displayEmail}</p>
                       </div>
                       <Link
                         href="/dashboard/settings"
@@ -159,7 +190,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         Settings
                       </Link>
                       <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                      <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <button 
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
                         <LogOut className="w-4 h-4" />
                         Sign Out
                       </button>

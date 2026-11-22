@@ -1,17 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AuthForm from "../components/AuthForm";
-import { ArrowLeft, Shield, Award, CheckCircle, Ticket } from "lucide-react";
+import { ArrowLeft, Shield, Award, CheckCircle, Ticket, AlertCircle } from "lucide-react";
+import { api, type LoginResponse } from "@/lib/api";
+import type { AuthFormData } from "../components/AuthForm";
 
 export default function LoginPage() {
-  const handleSubmit = async (data: { email: string; password: string }) => {
-    // TODO: Connect to backend API
-    console.log("Login attempt:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Simulate successful login
-    window.location.href = "/dashboard";
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (data: AuthFormData) => {
+    // Narrow to LoginData since mode is "login"
+    const loginData = data as { username: string; password: string };
+    setError(null);
+    
+    try {
+      const response = await api.login(loginData);
+      
+      // Store the token (in a real app, use httpOnly cookies or secure storage)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', response.access_token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+      }
+      
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed. Please try again.");
+      }
+      throw err; // Re-throw to let AuthForm handle loading state
+    }
   };
 
   return (
@@ -91,6 +114,18 @@ export default function LoginPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Sign In</h1>
             <p className="text-gray-600 dark:text-gray-400">Enter your credentials to access your account</p>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 text-sm"
+            >
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{error}</span>
+            </motion.div>
+          )}
 
           {/* Login Form */}
           <AuthForm mode="login" onSubmit={handleSubmit} />
