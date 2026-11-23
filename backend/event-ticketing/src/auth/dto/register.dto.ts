@@ -1,5 +1,8 @@
-import {IsEmail, IsNotEmpty, IsNumber, IsString, Matches, Max, MaxLength, Min, MinLength} from 'class-validator';
-import { Match } from '../common/decorators/match.decorator.js';
+import {IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength} from 'class-validator';
+import { Match } from '../../common/decorator/match.decorator.js';
+import { Role } from '../../common/decorator/roles.decorator.js';
+import { Roles } from '../../roles/roles.enum.js';
+
 
 export class CreateUserDto {
 
@@ -27,5 +30,9 @@ export class CreateUserDto {
     @IsNotEmpty()
     @Match('password', {message: 'Passwords do not match'})
     confirmPassword: string;
+
+    @IsEnum(Roles)
+    @IsOptional()
+    role: Roles;
 
 }

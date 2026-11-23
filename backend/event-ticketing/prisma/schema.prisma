@@ -9,6 +9,8 @@ datasource db {
 
 model events {
   id         Int       @id @default(autoincrement())
+  title      String
+  descrption String
   event_name String    @db.VarChar(100)
   event_date DateTime? @db.Timestamp(6)
 }
