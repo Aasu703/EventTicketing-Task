@@ -1,9 +1,16 @@
-import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
-import { CreateUserDto } from './register.dto.js';
+import { Body, Controller, Get, Post, UseGuards, Req} from '@nestjs/common';
+import { CreateUserDto } from './dto/register.dto.js';
 import { AuthService } from './auth.service.js';
-import { LoginDto } from './login.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 import { AuthGuard } from './guard/auth.guard.js';
+import * as express from 'express';
+import { Role} from '../common/decorator/roles.decorator.js'
+import { Roles } from '../roles/roles.enum.js';
 
+
+interface AuthenticatedRequest extends express.Request {
+    user: {sub: string, email:string};
+}
 @Controller('auth')
 export class AuthController {
     constructor(private userService : AuthService) {}
@@ -22,9 +29,10 @@ export class AuthController {
     }
 
     @UseGuards(AuthGuard)
+    @Role(Roles.Admin)
     @Get('/profile')
-    async getProfile(@Request() req) {
-        return req.user;
+    async getProfile(@Req() req: AuthenticatedRequest) {
+        return req.user;    
     }
     
 

@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './register.dto.js';
+import { CreateUserDto } from './dto/register.dto.js';
 import { User } from './user.model.js';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma.service.js';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'bcryptjs';
-import { LoginDto } from './login.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -71,6 +71,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync({
         email: user.email,
         id: user.id,
+        roles: user.role,
     })
     return {accessToken};
 
