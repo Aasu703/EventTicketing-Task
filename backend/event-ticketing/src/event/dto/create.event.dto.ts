@@ -17,10 +17,10 @@ venue: string;
 
 @IsString()
 @IsNotEmpty()
-startTime: string;
+startTime: Date;
 
 @IsDateString()
-endTime: string;
+endTime: Date;
 
 @IsNumber({ maxDecimalPlaces: 2 })
 @Min(0)

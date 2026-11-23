@@ -5,10 +5,10 @@ export class PaginationQueryDto {
     @IsOptional()
     @IsPositive()
 
-    limit: number
+    limit: number // how many items per page 10, 20....
 
     @IsOptional()
     @IsPositive()
 
-    page: number
+    page: number // in 1 page
 }
