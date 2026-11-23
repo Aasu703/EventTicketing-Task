@@ -19,12 +19,13 @@ const TRANSITIONS: Record<EventStatus, EventStatus[]> = {
 @Injectable()
 export class EventService {
     constructor(private repo: EventsRepository, private cache: EventsCache) {}
-    
     async create(dto: CreateEventDto, organizerId: number) {
+        console.log('moeow');
       this.assertDates(dto.startTime, dto.endTime);
       if (dto.startTime <=  new Date()) {
         throw new BadRequestException('Start time must be in the future');
       }
+      console.log('moeow2');
       return this.repo.create({...dto, organizerId})
     }
 
