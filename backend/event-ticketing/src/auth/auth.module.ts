@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma.service.js';
 import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from '../roles/roles.guard.js';
 import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guard/auth.guard.js';
 
 @Module({
     imports: [
@@ -18,6 +19,10 @@ import { APP_GUARD } from '@nestjs/core';
     ],
   controllers: [AuthController],
   providers: [{
+    provide : APP_GUARD,
+    useClass: AuthGuard,
+  },
+  {
     provide: APP_GUARD,
     useClass: RolesGuard,
   },
