@@ -67,6 +67,8 @@ export class AuthService {
         throw new UnauthorizedException("Invalid password");
     }
 
+    const payload = {email: user.email, sub: user.id, roles: user.role};
+
     // if password match return jwt token
     const accessToken = await this.jwtService.signAsync({
         email: user.email,
