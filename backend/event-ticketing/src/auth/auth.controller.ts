@@ -1,9 +1,14 @@
-import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Req} from '@nestjs/common';
 import { CreateUserDto } from './register.dto.js';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './login.dto.js';
 import { AuthGuard } from './guard/auth.guard.js';
+import * as express from 'express';
 
+
+interface AuthenticatedRequest extends express.Request {
+    user: {sub: string, email:string};
+}
 @Controller('auth')
 export class AuthController {
     constructor(private userService : AuthService) {}
@@ -23,8 +28,8 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Get('/profile')
-    async getProfile(@Request() req) {
-        return req.user;
+    async getProfile(@Req() req: AuthenticatedRequest) {
+        return req.user;    
     }
     
 
