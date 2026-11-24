@@ -18,7 +18,7 @@ export class AuthController {
     constructor(private userService : AuthService) {}
     @Public()
     @Post('/register')
-    async acreateUser(
+    async createUser(
         @Body() createUserDto: CreateUserDto
     ){
         return await this.userService.registerUser(createUserDto);

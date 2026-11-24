@@ -22,7 +22,7 @@ export class AuthService {
                 email: payload.email,
                 phoneNumber: payload.phoneNumber,
                 password: hash,
-               
+                role: payload.role ? [payload.role] : ['CUSTOMER'] 
             },
             select: {
                 id: true,

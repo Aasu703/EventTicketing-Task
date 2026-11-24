@@ -7,26 +7,196 @@ datasource db {
   provider = "postgresql"
 }
 
-model events {
-  id         Int       @id @default(autoincrement())
-  title      String
-  descrption String
-  event_name String    @db.VarChar(100)
-  event_date DateTime? @db.Timestamp(6)
-}
-
 enum Role {
   ADMIN
   ORGANIZER
   CUSTOMER
 }
 
-model User{
-  id         Int      @id @default(autoincrement())
-  username  String    @unique
-  email      String   @unique 
-  phoneNumber String 
-  password   String
-  role       Role[]   @default([CUSTOMER])
-  createdAt  DateTime @default(now())
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentStatus {
+  SUCCESSFUL
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  email       String   @unique
+  phoneNumber String
+  password    String
+  role        Role[]   @default([CUSTOMER])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organizedEvents Event[]      @relation("EventOrganizer")
+  orders          Order[]      @relation("OrderCustomer")
+  tickets         Ticket[]     @relation("TicketCustomer")
+  checkins        Ticket[]     @relation("TicketCheckedInBy")
+  payments        Payment[]    @relation("PaymentCustomer")
+  holds           TicketHold[]
+
+  @@index([role])
+}
+
+model Event {
+  id            Int         @id @default(autoincrement())
+  title         String      @db.VarChar(255)
+  description   String      @db.Text
+  venue         String      @db.VarChar(500)
+  startTime     DateTime
+  endTime       DateTime
+  ticketPrice   Decimal     @db.Decimal(10, 2)
+  totalQuantity Int
+  maxPerOrder   Int         @default(10)
+  status        EventStatus @default(DRAFT)
+  organizerId   Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  organizer   User         @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Restrict)
+  ticketTypes TicketType[]
+  orders      Order[]
+  tickets     Ticket[]
+  holds       TicketHold[]
+
+  @@index([status, startTime])
+  @@index([organizerId])
+  @@index([title])
+}
+
+model TicketType {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  price     Decimal  @db.Decimal(10, 2)
+  quantity  Int
+  sold      Int      @default(0)
+  eventId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event   Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tickets Ticket[]
+  orders  Order[]
+  holds   TicketHold[]
+
+  @@unique([eventId, name])
+}
+
+model Order {
+  id            Int           @id @default(autoincrement())
+  orderNumber   String        @unique @default(uuid())
+  customerId    Int
+  eventId       Int
+  ticketTypeId  Int
+  quantity      Int
+  unitPrice     Decimal       @db.Decimal(10, 2)
+  totalAmount   Decimal       @db.Decimal(10, 2)
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(FAILED)
+  paidAt        DateTime?
+  cancelledAt   DateTime?
+  holdId        Int?          @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  customer   User        @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  ticketType TicketType  @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+  hold       TicketHold? @relation(fields: [holdId], references: [id], onDelete: SetNull)
+  tickets    Ticket[]
+  payment    Payment?
+
+  @@index([customerId])
+  @@index([eventId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model Ticket {
+  id           Int       @id @default(autoincrement())
+  code         String    @unique @default(cuid())
+  orderId      Int
+  ticketTypeId Int
+  eventId      Int
+  customerId   Int
+  checkedIn    Boolean   @default(false)
+  checkedInAt  DateTime?
+  checkedInBy  Int?
+  createdAt    DateTime  @default(now())
+
+  order           Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType      TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+  event           Event      @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  customer        User       @relation("TicketCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  checkedInByUser User?      @relation("TicketCheckedInBy", fields: [checkedInBy], references: [id], onDelete: SetNull)
+
+  @@index([eventId])
+  @@index([customerId])
+  @@index([checkedIn])
+}
+
+model Payment {
+  id          Int           @id @default(autoincrement())
+  orderId     Int           @unique
+  customerId  Int
+  amount      Decimal       @db.Decimal(10, 2)
+  status      PaymentStatus @default(FAILED)
+  provider    String        @default("esewa")
+  providerRef String?
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation("PaymentCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([providerRef])
+  @@index([customerId])
+}
+
+model TicketHold {
+  id           Int      @id @default(autoincrement())
+  eventId      Int
+  ticketTypeId Int
+  customerId   Int
+  quantity     Int
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+  customer   User       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  order      Order?
+
+  @@index([eventId, ticketTypeId])
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
 }
