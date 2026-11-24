@@ -13,10 +13,11 @@ export class EventsRepository {
   }
 
   create(data: Prisma.EventCreateInput) {
-    const { ticketTypes, ...eventData } = data as any;
+    const { ticketTypes, organizerId, ...eventData } = data as any;
     return this.prisma.event.create({
       data: {
         ...eventData,
+        organizerId,
         ticketTypes: ticketTypes ? { create: ticketTypes as Prisma.TicketTypeCreateWithoutEventInput[] } : undefined,
       },
       include: { ticketTypes: true },
