@@ -38,6 +38,6 @@ import { AuthService } from './auth/auth.service.js';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    AuthService],
+    AuthService, AppService],
 })
 export class AppModule {}

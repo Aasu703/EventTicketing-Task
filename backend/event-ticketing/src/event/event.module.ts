@@ -9,5 +9,6 @@ import { RedisModule } from '../redis/redis.module.js';
   imports: [RedisModule],
   controllers: [EventController],
   providers: [EventService, EventsRepository, EventsCache],
+  exports: [EventService],
 })
 export class EventModule {}
