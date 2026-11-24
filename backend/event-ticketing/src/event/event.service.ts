@@ -42,12 +42,21 @@ export class EventService {
             quantity: t.quantity,
         })) || [];
 
-        return this.repo.create({
-            ...dto,
-            organizerId,
+        // Explicitly construct input to avoid spread conflicts with ticketTypes
+        const input = {
+            title: dto.title,
+            description: dto.description,
+            venue: dto.venue,
+            startTime: dto.startTime,
+            endTime: dto.endTime,
             ticketPrice: new Prisma.Decimal(dto.ticketPrice),
+            totalQuantity: dto.totalQuantity,
+            maxPerOrder: dto.maxPerOrder ?? 10,
+            organizerId,
             ticketTypes: ticketTypesData.length > 0 ? { create: ticketTypesData } : undefined,
-        } as any);
+        };
+
+        return this.repo.create(input as any);
     }
 
     async update(id: number, dto: UpdateEventDto, userId: number) {

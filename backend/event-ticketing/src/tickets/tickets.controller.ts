@@ -25,7 +25,7 @@ export class TicketsController {
     @Param('code') code: string,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.tickets.checkIn(code, req.user.sub);
+    return this.tickets.checkIn(code, Number(req.user.sub));
   }
 
   @Role(Roles.Customer)
@@ -39,7 +39,7 @@ export class TicketsController {
     @Query() q: PaginationQueryDto,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.tickets.getMyTickets(req.user.sub);
+    return this.tickets.getMyTickets(Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -52,7 +52,7 @@ export class TicketsController {
     @Param('eventId', ParseIntPipe) eventId: number,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.tickets.getEventTickets(eventId, req.user.sub);
+    return this.tickets.getEventTickets(eventId, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -65,7 +65,7 @@ export class TicketsController {
     @Param('eventId', ParseIntPipe) eventId: number,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.tickets.getCheckInStats(eventId, req.user.sub);
+    return this.tickets.getCheckInStats(eventId, Number(req.user.sub));
   }
 
   @Role(Roles.Customer, Roles.Organizer)

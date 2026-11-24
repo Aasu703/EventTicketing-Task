@@ -66,11 +66,7 @@ export class AuthService {
         const payload = {email: user.email, sub: user.id, roles: user.role};
 
         // if password match return jwt token
-        const accessToken = await this.jwtService.signAsync({
-            email: user.email,
-            id: user.id,
-            roles: user.role,
-        })
+        const accessToken = await this.jwtService.signAsync(payload)
         return {accessToken};
     }
 }
