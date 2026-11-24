@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException,ForbiddenException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { OrdersRepository } from './orders.repository.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { PayOrderDto } from './dto/pay-order.dto.js';

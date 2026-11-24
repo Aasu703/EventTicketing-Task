@@ -210,7 +210,11 @@ export class EventService {
         return updated;
     }
 
-    private async getOwned(id: number, userId: number) {
+    async findEventsToComplete(now: Date) {
+    return this.repo.findEventsToComplete(now);
+  }
+
+  private async getOwned(id: number, userId: number) {
         const event = await this.repo.findById(id);
         if (!event) throw new BadRequestException('Event not found');
         if (event.organizerId !== userId) throw new ForbiddenException('You do not have permission to modify this event');

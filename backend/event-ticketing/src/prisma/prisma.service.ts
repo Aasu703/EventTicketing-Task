@@ -1,8 +1,9 @@
 import "dotenv/config";
-import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
-import {PrismaClient} from "./generated/prisma/client.js";
+import { Global, Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import {PrismaClient} from "../generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 
+@Global()
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
    constructor() {
@@ -16,10 +17,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     };
 
   async onModuleInit() {
-    await this.$connect(); // connect to db
+    await this.$connect();
   }
 
   async onModuleDestroy() {
-    await this.$disconnect(); // disconnect from db
+    await this.$disconnect();
   }
 }

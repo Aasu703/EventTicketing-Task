@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { Prisma, EventStatus } from '../generated/prisma/client.js';
 import { PublicEventDto } from './dto/public-event.dto.js';
 import { PaginationQueryDto } from '../common/pagination/pagination-query.dto.js';
@@ -101,5 +101,15 @@ export class EventsRepository {
 
   async deleteTicketType(id: number) {
     return this.prisma.ticketType.delete({ where: { id } });
+  }
+
+  async findEventsToComplete(now: Date) {
+    return this.prisma.event.findMany({
+      where: {
+        status: EventStatus.PUBLISHED,
+        endTime: { lt: now },
+      },
+      select: { id: true, organizerId: true },
+    });
   }
 }
