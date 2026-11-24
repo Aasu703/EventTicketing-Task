@@ -264,6 +264,8 @@ async checkIn(ticketId: number, checkedInBy: number) {
 
 ### With More Time
 
+*** Frontend integration is out of scope for this backend API. A React/Next.js frontend can consume these endpoints. ***
+
 | Priority | Improvement | Effort |
 |----------|-------------|--------|
 | **Real Payment Gateway** | Esewa/Stripe webhook integration | Medium |
@@ -280,6 +282,7 @@ async checkIn(ticketId: number, checkedInBy: number) {
 | **Monitoring** | Prometheus/Grafana metrics | Low |
 | **API Versioning** | `/v1/`, `/v2/` routing | Low |
 | **Soft Delete Recovery** | Restore deleted users/events | Low |
+
 
 ### Technical Debt
 
