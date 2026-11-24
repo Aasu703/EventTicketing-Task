@@ -1,0 +1,24 @@
+# Local development override - uses host PostgreSQL instead of container
+# Run with: docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+
+services:
+  postgres:
+    # Disable postgres container for local dev
+    deploy:
+      replicas: 0
+
+  app:
+    environment:
+      # Use host PostgreSQL (your local v18)
+      DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:5432/event_ticketing?schema=public
+      # Or if running on same machine without Docker Desktop:
+      # DATABASE_URL: postgresql://postgres:postgres@172.17.0.1:5432/event_ticketing?schema=public
+    volumes:
+      # Mount source for hot reload
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    # Remove depends_on postgres since we're using host
+    depends_on:
+      redis:
+        condition: service_healthy

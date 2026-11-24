@@ -8,6 +8,7 @@ import { PublicEventDto } from './dto/public-event.dto.js';
 import { PaginationQueryDto } from '../common/pagination/pagination-query.dto.js';
 import { buildPaginatedResponse } from '../common/pagination/paginate.js';
 import { TicketTypeResponseDto } from '../tickets/dto/ticket-type-response.dto.js';
+import { OrdersService } from '../orders/orders.service.js';
 
 
 const TRANSITIONS: Record<EventStatus, EventStatus[]> = {
@@ -19,7 +20,7 @@ const TRANSITIONS: Record<EventStatus, EventStatus[]> = {
 
 @Injectable()
 export class EventService {
-    constructor(private repo: EventsRepository, private cache: EventsCache) {}
+    constructor(private repo: EventsRepository, private cache: EventsCache, private ordersService: OrdersService) {}
 
     async create(dto: CreateEventDto, organizerId: number) {
         this.assertDates(dto.startTime, dto.endTime);
@@ -85,8 +86,22 @@ export class EventService {
         });
     }
 
-    cancel(id: number, userId: number) {
-        return this.changeStatus(id, userId, EventStatus.CANCELLED);
+    async cancel(id: number, userId: number) {
+        const event = await this.getOwned(id, userId);
+        if (event.status === EventStatus.CANCELLED) {
+            throw new BadRequestException('Event is already cancelled');
+        }
+
+        const { cancelledCount, totalRefunded } = await this.ordersService.cancelOrdersByEvent(id);
+        const updated = await this.changeStatus(id, userId, EventStatus.CANCELLED);
+        await this.cache.invalidate(id);
+        return {
+          ...updated,
+          cancellationSummary: {
+            ordersCancelled: cancelledCount,
+            totalRefunded,
+          }
+        };
     }
 
     async findPublic(q: PublicEventDto) {

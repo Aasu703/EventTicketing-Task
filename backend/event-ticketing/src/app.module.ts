@@ -11,6 +11,7 @@ import { OrdersModule } from './orders/orders.module.js';
 import { TicketsModule } from './tickets/tickets.module.js';
 import { CronModule } from './common/cron/cron.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { ReportsModule } from './reports/reports.module.js';
 import { AuthGuard } from './auth/guard/auth.guard.js';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles/roles.guard.js';
@@ -27,7 +28,8 @@ import { AuthService } from './auth/auth.service.js';
     RedisModule,
     OrdersModule,
     TicketsModule,
-    CronModule
+    CronModule,
+    ReportsModule
   ],
   controllers: [AppController, DashboardController],
   providers: [{

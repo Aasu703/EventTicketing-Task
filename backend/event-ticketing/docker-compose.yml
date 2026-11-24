@@ -1,4 +1,22 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: event-ticketing-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: event_ticketing
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d event_ticketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: event-ticketing-redis
@@ -19,8 +37,7 @@ services:
       dockerfile: Dockerfile
     container_name: event-ticketing-api
     environment:
-      # Connects to PostgreSQL on host machine (Windows/Mac Docker Desktop)
-      DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:5432/event_ticketing?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/event_ticketing?schema=public
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       PORT: 3000
@@ -28,6 +45,8 @@ services:
     ports:
       - "3000:3000"
     depends_on:
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     restart: unless-stopped
@@ -35,8 +54,7 @@ services:
       - .:/app
       - /app/node_modules
       - /app/dist
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
 volumes:
+  postgres_data:
   redis_data:

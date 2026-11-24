@@ -229,4 +229,53 @@ export class OrdersService {
     
     return { cleaned: staleOrders.length };
   }
+
+  async cancelOrdersByEvent(eventId: number) {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        eventId,
+        status: OrderStatus.PAID,
+      },
+      include: { ticketType: true, hold: true }
+    });
+
+    let cancelledCount = 0;
+    let totalRefunded = new Prisma.Decimal(0);
+
+    for (const order of orders) {
+      await this.prisma.$transaction(async (tx) => {
+        await tx.order.update({
+          where: { id: order.id },
+          data: { status: OrderStatus.CANCELLED, cancelledAt: new Date() }
+        });
+
+        await tx.ticketType.update({
+          where: { id: order.ticketTypeId },
+          data: { sold: { decrement: order.quantity } }
+        });
+
+        await tx.ticket.deleteMany({ where: { orderId: order.id } });
+
+        await tx.payment.create({
+          data: {
+            orderId: order.id,
+            customerId: order.customerId,
+            amount: order.totalAmount,
+            status: PaymentStatus.REFUNDED,
+            provider: 'esewa',
+            metadata: { refundedAt: new Date().toISOString(), reason: 'Event cancelled by organizer' }
+          }
+        });
+
+        if (order.holdId) {
+          await tx.ticketHold.delete({ where: { id: order.holdId } });
+        }
+      });
+
+      cancelledCount++;
+      totalRefunded = totalRefunded.plus(order.totalAmount);
+    }
+
+    return { cancelledCount, totalRefunded: totalRefunded.toNumber() };
+  }
 }
