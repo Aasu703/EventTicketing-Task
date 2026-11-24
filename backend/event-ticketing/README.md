@@ -6,12 +6,7 @@ A NestJS REST API for an event ticketing platform where organizers create events
 
 ##  Quick Start
 
-### Prerequisites
-- Node.js 20+
-- PostgreSQL 16+
-- Redis 7+
-
-### Using Docker (Recommended)
+### Using Docker 
 
 ```bash
 # Clone and navigate
@@ -104,26 +99,25 @@ Client → Auth Guard → Role Guard → Controller → Service → Repository �
 ```
 main
   │
-  ├── develop
-  │     │
-  │     ├── feature/auth-refactor
-  │     ├── feature/event-tickets
-  │     └── feature/admin-dashboard
+  │  ────  │
+  │     ├── feat/auth
+  │     ├── feat/event
+  │     └── feat/admin
   │
-  ├── release/v1.0.0
+  ├
   │
-  └── hotfix/security-patch
+  └── fixes/
 ```
 
 ### Rules
 
 | Branch | Purpose | Protection |
 |--------|---------|------------|
-| `main` | Production-ready | PR required, CI must pass |
-| `develop` | Integration branch | PR required |
-| `feature/*` | New features | PR to `develop` |
-| `release/*` | Release preparation | PR to `main` |
-| `hotfix/*` | Production fixes | PR to `main` + `develop` |
+| `main` | Production-ready | PR required,  |
+
+| `feature/*` | New features | PR to `Main` |
+  `fixes/*` | Bug fixes | PR to `Main` |
+
 
 ### Commit Convention
 
