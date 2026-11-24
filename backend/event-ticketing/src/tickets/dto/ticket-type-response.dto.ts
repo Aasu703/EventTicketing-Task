@@ -1,16 +1,15 @@
-import { Expose } from 'class-transformer';
 import { TicketType } from '@prisma/client';
 
 export class TicketTypeResponseDto {
-    @Expose() id: number;
-    @Expose() name: string;
-    @Expose() price: number;
-    @Expose() quantity: number;
-    @Expose() sold: number;
-    @Expose() available: number;
-    @Expose() eventId: number;
-    @Expose() createdAt: Date;
-    @Expose() updatedAt: Date;
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    sold: number;
+    available: number;
+    eventId: number;
+    createdAt: Date;
+    updatedAt: Date;
 
     constructor(partial: Partial<TicketTypeResponseDto>) {
         Object.assign(this, partial);
