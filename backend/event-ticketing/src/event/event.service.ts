@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Prisma, EventStatus } from '@prisma/client';
+import { Prisma, EventStatus } from '../generated/prisma/client.js';
 import { Decimal } from '@prisma/client/runtime/client';
 import { EventsRepository } from './event.repository.js';
 import { EventsCache } from './events-cache.js';
