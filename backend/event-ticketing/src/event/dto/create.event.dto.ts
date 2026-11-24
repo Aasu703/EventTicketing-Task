@@ -1,10 +1,10 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class TicketTypeDto {
     @IsString()
     @IsNotEmpty()
-    @Max(100)
+    @MaxLength(100)
     name: string;
 
     @IsNumber({ maxDecimalPlaces: 2 })
