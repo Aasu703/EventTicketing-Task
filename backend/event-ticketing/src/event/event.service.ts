@@ -7,7 +7,8 @@ import { UpdateEventDto } from './dto/update-event.dto.js';
 import { PublicEventDto } from './dto/public-event.dto.js';
 import { PaginationQueryDto } from '../common/pagination/pagination-query.dto.js';
 import { buildPaginatedResponse } from '../common/pagination/paginate.js';
-import { TicketTypeResponseDto } from './dto/ticket-type-response.dto.js';
+import { TicketTypeResponseDto } from '../tickets/dto/ticket-type-response.dto.js';
+
 
 const TRANSITIONS: Record<EventStatus, EventStatus[]> = {
   DRAFT: [EventStatus.PUBLISHED, EventStatus.CANCELLED],
