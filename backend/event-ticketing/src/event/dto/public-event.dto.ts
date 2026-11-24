@@ -1,4 +1,5 @@
-import { IsDate, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { IsDateString, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { Type } from "class-transformer";
 import { PaginationQueryDto } from "../../common/pagination/pagination-query.dto.js";
 
 export class PublicEventDto extends PaginationQueryDto {
@@ -7,20 +8,22 @@ export class PublicEventDto extends PaginationQueryDto {
     search?: string;
 
     @IsOptional()
-    @IsDate()
-    startFrom?: Date;
+    @IsDateString()
+    startFrom?: string;
 
     @IsOptional()
-    @IsDate()
-    startTo?: Date;
+    @IsDateString()
+    startTo?: string;
 
     @IsOptional()
     @IsNumber()
     @Min(0)
+    @Type(() => Number)
     minPrice?: number;
     
     @IsOptional()
     @IsNumber()
     @Min(0)
+    @Type(() => Number)
     maxPrice?: number;
 }
