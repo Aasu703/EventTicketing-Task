@@ -60,7 +60,7 @@ export class EventController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   create(@Body() dto: CreateEventDto, @Req() req: AuthenicatedRequest) {
-    return this.events.create(dto, req.user.sub);
+    return this.events.create(dto, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -72,7 +72,7 @@ export class EventController {
   @ApiResponse({ status: 403, description: 'Not your event' })
   @ApiParam({ name: 'id', example: 1 })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEventDto, @Req() req: AuthenicatedRequest) {
-    return this.events.update(id, dto, req.user.sub);
+    return this.events.update(id, dto, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -83,7 +83,7 @@ export class EventController {
   @ApiResponse({ status: 400, description: 'Cannot publish past event' })
   @ApiParam({ name: 'id', example: 1 })
   publish(@Param('id', ParseIntPipe) id: number, @Req() req: AuthenicatedRequest) {
-    return this.events.publish(id, req.user.sub);
+    return this.events.publish(id, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -94,7 +94,7 @@ export class EventController {
   @ApiResponse({ status: 400, description: 'Event already cancelled' })
   @ApiParam({ name: 'id', example: 1 })
   cancel(@Param('id', ParseIntPipe) id: number, @Req() req: AuthenicatedRequest) {
-    return this.events.cancel(id, req.user.sub);
+    return this.events.cancel(id, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -105,7 +105,7 @@ export class EventController {
   @ApiResponse({ status: 400, description: 'Event has not ended yet' })
   @ApiParam({ name: 'id', example: 1 })
   complete(@Param('id', ParseIntPipe) id: number, @Req() req: AuthenicatedRequest) {
-    return this.events.complete(id, req.user.sub);
+    return this.events.complete(id, Number(req.user.sub));
   }
 
   // TicketType endpoints
@@ -122,7 +122,7 @@ export class EventController {
     @Body() dto: TicketTypeDto,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.events.createTicketType(eventId, dto, req.user.sub);
+    return this.events.createTicketType(eventId, dto, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -135,7 +135,7 @@ export class EventController {
     @Param('eventId', ParseIntPipe) eventId: number,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.events.getTicketTypes(eventId, req.user.sub);
+    return this.events.getTicketTypes(eventId, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -150,7 +150,7 @@ export class EventController {
     @Body() dto: Partial<TicketTypeDto>,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.events.updateTicketType(id, dto, req.user.sub);
+    return this.events.updateTicketType(id, dto, Number(req.user.sub));
   }
 
   @Role(Roles.Organizer)
@@ -165,6 +165,6 @@ export class EventController {
     @Param('id', ParseIntPipe) id: number,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.events.deleteTicketType(id, req.user.sub);
+    return this.events.deleteTicketType(id, Number(req.user.sub));
   }
 }

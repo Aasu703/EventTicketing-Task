@@ -18,7 +18,7 @@ export class EventsRepository {
       data: {
         ...eventData,
         organizerId,
-        ticketTypes: ticketTypes ? { create: ticketTypes as Prisma.TicketTypeCreateWithoutEventInput[] } : undefined,
+        ticketTypes,
       },
       include: { ticketTypes: true },
     });

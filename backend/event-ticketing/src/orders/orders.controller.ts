@@ -22,7 +22,7 @@ export class OrdersController {
   @ApiResponse({ status: 400, description: 'Not enough tickets or event not published' })
   @ApiResponse({ status: 404, description: 'Ticket type not found' })
   create(@Body() dto: CreateOrderDto, @Req() req: AuthenicatedRequest) {
-    return this.orders.create(dto, req.user.sub);
+    return this.orders.create(dto, Number(req.user.sub));
   }
 
   @Role(Roles.Customer)
@@ -33,7 +33,7 @@ export class OrdersController {
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   findMine(@Query() q: PaginationQueryDto, @Req() req: AuthenicatedRequest) {
-    return this.orders.findMine(req.user.sub, q);
+    return this.orders.findMine(Number(req.user.sub), q);
   }
 
   @Role(Roles.Organizer)
@@ -44,7 +44,7 @@ export class OrdersController {
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   findOrganizerOrders(@Query() q: PaginationQueryDto, @Req() req: AuthenicatedRequest) {
-    return this.orders.findOrganizerOrders(req.user.sub, q);
+    return this.orders.findOrganizerOrders(Number(req.user.sub), q);
   }
 
   @Role(Roles.Customer)
@@ -61,7 +61,7 @@ export class OrdersController {
     @Body() dto: PayOrderDto,
     @Req() req: AuthenicatedRequest
   ) {
-    return this.orders.pay(id, req.user.sub, dto);
+    return this.orders.pay(id, Number(req.user.sub), dto);
   }
 
   @Role(Roles.Customer)
@@ -74,7 +74,7 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiParam({ name: 'id', example: 1 })
   cancel(@Param('id', ParseIntPipe) id: number, @Req() req: AuthenicatedRequest) {
-    return this.orders.cancel(id, req.user.sub);
+    return this.orders.cancel(id, Number(req.user.sub));
   }
 
   @Role(Roles.Admin, Roles.Organizer)
