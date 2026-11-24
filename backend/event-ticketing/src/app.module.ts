@@ -13,6 +13,7 @@ import { RolesGuard } from './roles/roles.guard.js';
 import { AuthService } from './auth/auth.service.js';
 import { PrismaService } from './prisma.service.js';
 import { EventService } from './event/event.service.js';
+import { OrdersModule } from './orders/orders.module.js';
 
 
 @Module({
@@ -20,7 +21,8 @@ import { EventService } from './event/event.service.js';
     AuthModule,
     DashboardModule,
     EventModule,
-    RedisModule
+    RedisModule,
+    OrdersModule
   ],
   controllers: [AppController, DashboardController],
  providers: [{

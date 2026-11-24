@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, Patch, Delete } from '@nestjs/common';
 import { EventService } from './event.service.js';
 import { Public } from '../common/decorator/public.decorator.js';
 import { PublicEventDto } from './dto/public-event.dto.js';
 import { PaginationQueryDto } from '../common/pagination/pagination-query.dto.js';
 import { Role } from '../common/decorator/roles.decorator.js';
 import type { AuthenicatedRequest } from '../common/types/authenticate-request.js';
-import { CreateEventDto } from './dto/create.event.dto.js';
+import { CreateEventDto, TicketTypeDto } from './dto/create.event.dto.js';
 import { UpdateEventDto } from './dto/update-event.dto.js';
 import { Roles } from '../roles/roles.enum.js';
 
@@ -55,11 +55,48 @@ export class EventController {
         return this.events.cancel(id, req.user.sub);
     }
 
-     @Role(Roles.Organizer)
-    @Patch(':id/cancel')
+    @Role(Roles.Organizer)
+    @Patch(':id/complete')
     complete(@Param('id', ParseIntPipe) id: number, @Req() req: AuthenicatedRequest) {
-        return this.events.cancel(id, req.user.sub);
+        return this.events.complete(id, req.user.sub);
     }
-}    
 
+    // TicketType endpoints
+    @Role(Roles.Organizer)
+    @Post(':eventId/ticket-types')
+    createTicketType(
+        @Param('eventId', ParseIntPipe) eventId: number,
+        @Body() dto: TicketTypeDto,
+        @Req() req: AuthenicatedRequest
+    ) {
+        return this.events.createTicketType(eventId, dto, req.user.sub);
+    }
 
+    @Role(Roles.Organizer)
+    @Get(':eventId/ticket-types')
+    getTicketTypes(
+        @Param('eventId', ParseIntPipe) eventId: number,
+        @Req() req: AuthenicatedRequest
+    ) {
+        return this.events.getTicketTypes(eventId, req.user.sub);
+    }
+
+    @Role(Roles.Organizer)
+    @Patch('ticket-types/:id')
+    updateTicketType(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: Partial<TicketTypeDto>,
+        @Req() req: AuthenicatedRequest
+    ) {
+        return this.events.updateTicketType(id, dto, req.user.sub);
+    }
+
+    @Role(Roles.Organizer)
+    @Delete('ticket-types/:id')
+    deleteTicketType(
+        @Param('id', ParseIntPipe) id: number,
+        @Req() req: AuthenicatedRequest
+    ) {
+        return this.events.deleteTicketType(id, req.user.sub);
+    }
+}

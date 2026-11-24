@@ -1,11 +1,10 @@
 import { CreateEventDto } from "./create.event.dto.js";
 import { PartialType } from "@nestjs/mapped-types";
-import { EventStatus } from "../../generated/prisma/client.js";
-import { IsEnum, IsOptional } from "class-validator";
+import { IsOptional, IsEnum } from "class-validator";
+import { EventStatus } from "@prisma/client";
 
 export class UpdateEventDto extends PartialType(CreateEventDto) {
     @IsOptional()
     @IsEnum(EventStatus)
-    status? :EventStatus;
+    status?: EventStatus;
 }
-

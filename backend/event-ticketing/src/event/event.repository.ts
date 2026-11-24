@@ -12,8 +12,15 @@ export class EventsRepository {
     return this.prisma.event.findUnique({ where: { id } });
   }
 
-  create(data: Prisma.EventUncheckedCreateInput) {
-    return this.prisma.event.create({ data });
+  create(data: Prisma.EventCreateInput) {
+    const { ticketTypes, ...eventData } = data as any;
+    return this.prisma.event.create({
+      data: {
+        ...eventData,
+        ticketTypes: ticketTypes ? { create: ticketTypes as Prisma.TicketTypeCreateWithoutEventInput[] } : undefined,
+      },
+      include: { ticketTypes: true },
+    });
   }
 
   update(id: number, data: Prisma.EventUpdateInput) {
@@ -25,36 +32,74 @@ export class EventsRepository {
   }
 
   async listPublic(q: PublicEventDto) {
+    const page = Number(q.page) || 1;
+    const limit = Number(q.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const where: Prisma.EventWhereInput = {
       status: EventStatus.PUBLISHED,
-      startTime: { gt: new Date(), gte: q.startFrom, lte: q.startTo },
-      ticketPrice: { gte: q.minPrice, lte: q.maxPrice },
-      title: q.search ? { contains: q.search, mode: 'insensitive' } : undefined,
+      startTime: { gt: new Date() },
+      ...(q.startFrom && { gte: new Date(q.startFrom) }),
+      ...(q.startTo && { lte: new Date(q.startTo) }),
+      ...(q.minPrice !== undefined && { ticketPrice: { gte: q.minPrice } }),
+      ...(q.maxPrice !== undefined && { ticketPrice: { lte: q.maxPrice } }),
+      ...(q.search && { title: { contains: q.search, mode: 'insensitive' as const } }),
     };
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.event.findMany({
         where,
         orderBy: [{ startTime: 'asc' }, { id: 'asc' }],
-        skip: (q.page - 1) * q.limit,
-        take: q.limit,
+        skip,
+        take: limit,
       }),
       this.prisma.event.count({ where }),
     ]);
-    return { items, total };
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   async listByOrganizer(organizerId: number, q: PaginationQueryDto) {
+    const page = Number(q.page) || 1;
+    const limit = Number(q.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const where = { organizerId };
     const [items, total] = await this.prisma.$transaction([
       this.prisma.event.findMany({
         where,
         orderBy: { createdAt: 'desc' },
-        skip: (q.page - 1) * q.limit,
-        take: q.limit,
+        skip,
+        take: limit,
       }),
       this.prisma.event.count({ where }),
     ]);
-    return { items, total };
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  // TicketType methods
+  async createTicketType(data: Prisma.TicketTypeUncheckedCreateInput) {
+    return this.prisma.ticketType.create({ data });
+  }
+
+  async findTicketTypeById(id: number) {
+    return this.prisma.ticketType.findUnique({ 
+      where: { id },
+      include: { event: true }
+    });
+  }
+
+  async findTicketTypesByEvent(eventId: number) {
+    return this.prisma.ticketType.findMany({
+      where: { eventId },
+      include: { event: true }
+    });
+  }
+
+  async updateTicketType(id: number, data: Prisma.TicketTypeUpdateInput) {
+    return this.prisma.ticketType.update({ where: { id }, data, include: { event: true } });
+  }
+
+  async deleteTicketType(id: number) {
+    return this.prisma.ticketType.delete({ where: { id } });
   }
 }

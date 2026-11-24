@@ -4,11 +4,11 @@ import { Type } from "class-transformer"
 export class PaginationQueryDto {
     @IsOptional()
     @IsPositive()
-
-    limit: number // how many items per page 10, 20....
+    @Type(() => Number)
+    limit: number = 10;
 
     @IsOptional()
     @IsPositive()
-
-    page: number // in 1 page
+    @Type(() => Number)
+    page: number = 1;
 }
