@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { EventService } from './event.service.js';
 import { EventController } from './event.controller.js';
 import { EventsRepository } from './event.repository.js';
-import { PrismaService } from '../prisma.service.js';
 import { EventsCache } from './events-cache.js';
 import { RedisModule } from '../redis/redis.module.js';
+import { OrdersModule } from '../orders/orders.module.js';
 
 @Module({
-  imports: [RedisModule],
+  imports: [RedisModule, OrdersModule],
   controllers: [EventController],
-  providers: [EventService, EventsRepository, EventsCache, PrismaService],
+  providers: [EventService, EventsRepository, EventsCache],
+  exports: [EventService],
 })
 export class EventModule {}

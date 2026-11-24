@@ -21,7 +21,6 @@ export class TicketTypeDto {
 export class CreateEventDto {
     @IsString()
     @IsNotEmpty()
-    @Max(255)
     title: string;
 
     @IsString()
@@ -30,7 +29,6 @@ export class CreateEventDto {
 
     @IsString()
     @IsNotEmpty()
-    @Max(500)
     venue: string;
 
     @IsDateString()
